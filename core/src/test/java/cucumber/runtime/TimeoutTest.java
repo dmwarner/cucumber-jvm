@@ -49,7 +49,6 @@ public class TimeoutTest {
     public void doesnt_leak_threads() throws Throwable {
 
         long initialNumberOfThreads = Thread.getAllStackTraces().size();
-        long currentNumberOfThreads = Long.MAX_VALUE;
 
         boolean cleanedUp = false;
         for (int i = 0; i < 1000; i++) {
@@ -60,15 +59,13 @@ public class TimeoutTest {
                 }
             }, 10);
             Thread.sleep(5);
-            currentNumberOfThreads = Thread.getAllStackTraces().size();
-            if (i > 20 && currentNumberOfThreads <= initialNumberOfThreads) {
+            long currentNumberOfThreads = Thread.getAllStackTraces().size();
+            if (i > 20 && currentNumberOfThreads == initialNumberOfThreads) {
                 cleanedUp = true;
                 break;
             }
         }
-        assertTrue(String.format("Threads weren't cleaned up, initial count: %d current count: %d",
-                                 initialNumberOfThreads, currentNumberOfThreads),
-                   cleanedUp);
+        assertTrue("Threads weren't cleaned up", cleanedUp);
     }
 
     public static class Slow {
